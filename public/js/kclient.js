@@ -226,3 +226,42 @@ async function mic() {
     micEnabled = false;
   }
 }
+
+
+// --- TermHub: kclient ships the audio stream off; enable it per the machine setting. ---
+// TERMHUB_AUDIO_DEFAULT is rewritten at container start (install-autostart.sh). Keep the
+// exact `var TERMHUB_AUDIO_DEFAULT = "N";` shape — the start hook seds this literal line.
+// See docs/adr/0002-audio-default.md.
+var TERMHUB_AUDIO_DEFAULT = "1";
+(function () {
+  // Two separate things must happen, and conflating them was a real bug: audio() opens the
+  // PCM stream, but the AudioContext it creates starts SUSPENDED until a user gesture. So we
+  // must also resume() it — and must NOT treat "context exists" as "audio is working", or the
+  // gesture retry short-circuits and sound never starts.
+  function termhubAudioTick() {
+    try {
+      if (TERMHUB_AUDIO_DEFAULT !== "1") return true;   // disabled for this machine: stop retrying
+      if (typeof audio !== "function") return true;     // unknown kclient build: give up quietly
+      var ctx = (typeof player === "object" && player) ? player.audioCtx : null;
+      if (!ctx) { audio(); ctx = (typeof player === "object" && player) ? player.audioCtx : null; }
+      if (ctx && ctx.state === "suspended" && typeof ctx.resume === "function") { ctx.resume(); }
+      return !!(ctx && ctx.state === "running");        // done only once it is actually running
+    } catch (e) { return true; }                        // never break the session over audio
+  }
+  function termhubAudioArm() {
+    if (termhubAudioTick()) return;
+    // Still not running (autoplay gate). Retry on the first real user gestures, then stop.
+    var evs = ["pointerdown", "keydown", "touchstart"];
+    function onGesture() {
+      if (termhubAudioTick()) {
+        for (var i = 0; i < evs.length; i++) { window.removeEventListener(evs[i], onGesture, true); }
+      }
+    }
+    for (var i = 0; i < evs.length; i++) { window.addEventListener(evs[i], onGesture, true); }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", termhubAudioArm);
+  } else {
+    termhubAudioArm();
+  }
+})();
