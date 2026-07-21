@@ -28,6 +28,15 @@ ibetterai/terminal-streaming's browser-vnc Docker image via pinned `git clone` o
 
 - All user-facing sidebar strings go through the i18n lookup; never hardcode English in
   markup or JS. English is the fallback for every missing key/locale.
+- Locale resolution (ADR 0003): own `?lang=` → parent-frame `?lang=` → top-frame `?lang=`
+  → `localStorage['kclient.lang']` → `navigator.language` → `en`; persist to localStorage
+  ONLY from the URL tiers — never persist the navigator fallback.
+- Styling goes through the `--th-*` tokens in `public/css/theme.css` (vendored iBetter
+  values, dark default); `public/js/theme.js` maps TermHub's `localStorage['ib-theme']`
+  to `data-theme` on `<html>`, defaulting to dark when unreadable (ADR 0004). No web-font
+  or CDN imports — plain static files that render offline.
 - Changes must not regress audio default, clipboard, or file-manager behavior.
 - Commits touching `public/` are consumed verbatim by the terminal-streaming image build —
-  keep `public/js/kclient.js` path stable.
+  keep `public/js/kclient.js` path stable. The image overlays ONLY `public/`: `index.js`
+  changes don't ship there, so EJS templates must render under the stock base-image
+  `index.js` (new variables via `locals.*`, ADR 0003).

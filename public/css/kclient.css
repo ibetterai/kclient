@@ -1,3 +1,7 @@
+/* kclient wrapper chrome, styled against the TermHub tokens in theme.css (ADR 0004).
+ * Selectors are load-bearing for public/js/kclient.js — do not rename
+ * (.vnc, #files, #files_frame, .close, #lsbar, .icons, .icons-selected). */
+
 .vnc {
   position: fixed;
   top: 0;
@@ -21,28 +25,35 @@
   width: 60vw;
   height: 60vh;
   z-index: 2;
-  background-color: rgb(9 2 2 / 0.6);
-  border-radius: 10px;
-  border-style: inset;
-  border-color: rgb(255 255 255 / 0.6);
+  background-color: var(--th-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius-lg);
+  box-shadow: var(--th-shadow);
+  overflow: hidden;
 }
 
 #files_frame {
   width: 100%;
   height: 100%;
+  border: 0;
 }
 
 .close {
   position: absolute;
-  background: DimGray;
+  background: var(--th-bg3);
   top: -10px;
   right: -10px;
   cursor: pointer;
-  border-radius:50%;
-  border-style: inset;
-  border-color: rgb(255 255 255 / 0.6);
+  border-radius: 50%;
+  border: 1px solid var(--th-border);
   width: 20px;
   height: 20px;
+}
+.close:hover {
+  background: var(--th-danger);
+  border-color: var(--th-danger);
 }
 
 #lsbar {
@@ -54,25 +65,40 @@
   margin-right: auto;
   width: max-content;
   display: none;
-  background-color: rgb(9 2 2 / 0.6);
-  border-radius: 0 0 10px 10px;
-  border-style: inset;
-  border-color: rgb(255 255 255 / 0.6);
+  background-color: var(--th-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--th-border);
+  border-top: none;
+  border-radius: 0 0 var(--th-radius-lg) var(--th-radius-lg);
+  box-shadow: var(--th-shadow);
+  padding: 2px 4px;
 }
 
 .icons {
-  margin: 5px;
-  padding: 4px;
+  margin: 3px;
+  padding: 5px;
   height: 4vh;
   cursor: pointer;
-  border-radius: 3px;
-  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(105%) contrast(105%);
-}
-
-.icons-selected {
-  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--th-radius-sm);
+  /* Source glyphs are dark (#111); the token flips them white on dark chrome. */
+  filter: var(--th-icon-filter);
+  transition: background-color 150ms ease;
 }
 
 .icons:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--th-bg3);
+}
+
+/* Active state (audio/mic ON): filled accent chip with a white
+ * glyph — clearly distinct from the muted OFF look in both themes. kclient.js
+ * toggles this class; keep it CSS-only. Declared after .icons/.icons:hover so it
+ * wins at equal specificity in light mode too (where --th-icon-filter is none). */
+.icons-selected {
+  background: var(--th-accent);
+  filter: invert(100%);
+}
+
+.icons-selected:hover {
+  background: var(--th-accent-hover);
 }
