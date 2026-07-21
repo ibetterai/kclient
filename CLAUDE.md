@@ -21,6 +21,7 @@ ibetterai/terminal-streaming's browser-vnc Docker image via pinned `git clone` o
 | External dependencies | DEPENDENCIES.md | Active |
 | Domain glossary | CONTEXT.md | Active |
 | Architecture decisions | docs/adr/ | Active |
+| Architecture overview | ARCHITECTURE.md | Active |
 | Skill state | .claude/ | Active |
 
 ## Conventions
