@@ -1,6 +1,21 @@
-html * {
-  font-family: Poppins,Helvetica !important;
-  color: white !important;
+/* File-manager UI, styled against the TermHub tokens in theme.css (ADR 0004).
+ * DOM structure and class names are produced by public/js/filebrowser.js —
+ * keep every selector (.fileTable, .deleteButton, .directory, .file, .hidden,
+ * .right, #buttons, #folderName, #filebrowser, #dropzone, #loading). */
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  background: transparent; /* the #files panel in the parent page carries the surface */
+  font-family: var(--th-font-sans);
+  font-size: 13px;
+  color: var(--th-text);
 }
 
 .hidden {
@@ -12,54 +27,134 @@ html * {
   margin-right: 5px;
 }
 
-.directory, .file {
-  cursor: pointer;
+/* ── Toolbar ── */
+
+#buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+#folderName {
+  font: inherit;
+  color: var(--th-text);
+  background: var(--th-bg2);
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius-sm);
+  padding: 6px 10px;
+  outline: none;
+  min-width: 180px;
+}
+#folderName::placeholder {
+  color: var(--th-text-muted);
+}
+#folderName:focus {
+  border-color: var(--th-accent);
 }
 
 button {
-  background-color: rgb(9 2 2 / 0.6);
-  border-radius: 5px;
-  border-style: inset;
-  border-color: rgb(255 255 255 / 0.6);
+  font: inherit;
+  font-weight: 500;
+  color: var(--th-text);
+  background: var(--th-bg3);
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius-sm);
+  padding: 6px 12px;
   cursor: pointer;
-  margin: 5px;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
 
-.deleteButton {
-  margin: 0px !important;
-  float: right;
+button:hover {
+  border-color: var(--th-accent);
+  background: var(--th-bg2);
 }
+
+/* ── Current-path / status lines (plain divs appended by filebrowser.js) ── */
+
+#filebrowser > div:not(#loading) {
+  font-family: var(--th-font-mono);
+  font-size: 12px;
+  color: var(--th-text-muted);
+  margin: 10px 0 0;
+  overflow-wrap: anywhere;
+}
+
+/* ── File table ── */
 
 .fileTable {
   border-collapse: collapse;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 td, th {
-  border: 2px solid #ddd;
-  padding: 8px;
+  border: none;
+  border-bottom: 1px solid var(--th-border);
+  padding: 8px 10px;
+  text-align: left;
 }
 
-tr:hover, button:hover {
-  background: rgba(255, 255, 255, 0.3)
+th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--th-text-muted);
 }
+
+tr:hover td {
+  background: var(--th-bg3);
+}
+
+.directory, .file {
+  cursor: pointer;
+}
+
+.directory {
+  color: var(--th-accent);
+  font-weight: 500;
+}
+
+.file:hover, .directory:hover {
+  color: var(--th-accent-hover);
+}
+
+.deleteButton {
+  margin: 0 !important;
+  float: right;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--th-danger);
+  background: transparent;
+  border-color: var(--th-border);
+}
+.deleteButton:hover {
+  color: #ffffff;
+  background: var(--th-danger);
+  border-color: var(--th-danger);
+}
+
+/* ── Drag-and-drop overlay + spinner ── */
 
 #dropzone {
-  position: fixed; top: 0; left: 0; 
-  z-index: 9999999999;               
-  width: 100%; height: 100%;         
-  background-color: rgba(0,0,0,0.5);
+  position: fixed; top: 0; left: 0;
+  z-index: 9999999999;
+  width: 100%; height: 100%;
+  background-color: rgba(2, 132, 199, 0.18);
+  outline: 2px dashed var(--th-accent);
+  outline-offset: -10px;
   transition: visibility 175ms, opacity 175ms;
 }
 
 #loading {
   display: inline-block;
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(0,0,0,.3);
+  width: 40px;
+  height: 40px;
+  margin-top: 12px;
+  border: 3px solid var(--th-border);
   border-radius: 50%;
-  border-top-color: black;
+  border-top-color: var(--th-accent);
   animation: spin 1s ease-in-out infinite;
   -webkit-animation: spin 1s ease-in-out infinite;
 }

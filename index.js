@@ -39,7 +39,17 @@ app.engine('json', require('ejs').renderFile);
 baseRouter.use('/public', express.static(__dirname + '/public'));
 baseRouter.use('/vnc', express.static("/usr/share/kasmvnc/www/"));
 baseRouter.get('/', function (req, res) {
-  res.render(__dirname + '/public/index.html', {title: TITLE, path: PATH});
+  // ADR 0003: template the session language through to the files iframe so the
+  // file manager is tier-1 deterministic. Strict allowlist BEFORE templating —
+  // the value that reaches the EJS template is exactly 'zh_CN' | 'en' | null.
+  var lang = (function (q) {
+    if (typeof q !== 'string') return null;
+    var v = q.trim().toLowerCase().replace(/_/g, '-');
+    if (v === 'zh' || v === 'zh-cn' || v.indexOf('zh-hans') === 0) return 'zh_CN';
+    if (v.indexOf('en') === 0) return 'en';
+    return null;
+  })(req.query.lang);
+  res.render(__dirname + '/public/index.html', {title: TITLE, path: PATH, lang: lang});
 });
 baseRouter.get('/favicon.ico', function (req, res) {
   res.sendFile(__dirname + '/public/favicon.ico');

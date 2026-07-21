@@ -1,0 +1,57 @@
+/* TermHub-aligned design tokens (ADR 0004).
+ *
+ * Values mirror the iBetter shared design tokens (portal.ibetter.ai/ibetter.css,
+ * --ib-* prefix) but are vendored here: kclient must render standalone with zero
+ * external requests (fork rule: plain static files, works offline of any CDN).
+ * Dark is the default; public/js/theme.js sets data-theme="light" on <html> when
+ * TermHub's theme preference (the 'ib-theme' cookie / legacy localStorage['theme'])
+ * or the OS says so.
+ *
+ * No web-font imports on purpose — Google Fonts is unreachable from some client
+ * networks (China route); the stack degrades to system sans/mono.
+ */
+
+:root,
+[data-theme="dark"] {
+  /* Surfaces (mirrors --ib-bg-base / -primary / -secondary) */
+  --th-bg: #08141d;
+  --th-bg2: #0f2230;
+  --th-bg3: #173245;
+  /* Translucent chrome over the VNC canvas (mirrors --ib-glass) */
+  --th-surface: rgba(10, 29, 41, 0.88);
+  --th-border: rgba(174, 207, 224, 0.2);
+  /* Text */
+  --th-text: #eff8fc;
+  --th-text-muted: #a9c5d4;
+  /* Accent + semantic */
+  --th-accent: #0284c7;
+  --th-accent-hover: #01a2e8;
+  --th-green: #3d9970;
+  --th-danger: #dc2626;
+  /* Icons are dark (#111) SVG glyphs: invert to white on dark chrome */
+  --th-icon-filter: invert(100%);
+  /* Type + shape (mirrors --ib-font-* / --ib-radius-*) */
+  --th-font-sans: 'Jost', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+  --th-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  --th-radius-sm: 6px;
+  --th-radius-md: 8px;
+  --th-radius-lg: 12px;
+  --th-shadow: 0 10px 15px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] {
+  --th-bg: #f8fafc;
+  --th-bg2: #ffffff;
+  --th-bg3: #f0f7fc;
+  --th-surface: rgba(255, 255, 255, 0.92);
+  --th-border: #d6e8f2;
+  --th-text: #0f2b3d;
+  --th-text-muted: #6b8a99;
+  --th-accent: #0284c7;
+  --th-accent-hover: #01a2e8;
+  --th-green: #3d9970;
+  --th-danger: #dc2626;
+  /* Glyphs are already dark: no filter in light mode */
+  --th-icon-filter: none;
+  --th-shadow: 0 10px 15px rgba(15, 43, 61, 0.12);
+}

@@ -8,7 +8,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+    <link href="public/css/theme.css" rel="stylesheet">
     <link href="public/css/kclient.css" rel="stylesheet">
+    <!-- theme.js runs synchronously in head so data-theme is set before first paint -->
+    <script src="public/js/theme.js"></script>
     <script src="audio/socket.io/socket.io.js"></script>
   </head>
   <body>
@@ -22,7 +25,10 @@
     </div>
     <!--File Browser-->
     <div id="files">
-      <iframe id="files_frame" name="files_frame" src="files" frameborder="0"></iframe>
+      <!-- locals.lang (ADR 0003): allowlisted 'zh_CN'|'en' from index.js, or undefined
+           when a stock/base-image index.js renders this template — then the files frame
+           falls back to the parent-frame ?lang= tier in i18n.js. -->
+      <iframe id="files_frame" name="files_frame" src="files<% if (locals.lang) { %>?lang=<%= locals.lang %><% } %>" frameborder="0"></iframe>
       <div class="close" onclick="closeToggle('#files')"></div>
     </div>
     <!--Main logic-->

@@ -14,8 +14,6 @@ socket.on('connect',function(){
 // Get file list
 function getFiles(directory) {
   directory = directory.replace("//","/");
-  directory = directory.replace("|","'");
-  let directoryClean = directory.replace("'","|");
   if ((directory !== '/') && (directory.endsWith('/'))) {
     directory = directory.slice(0, -1);
   }
@@ -24,18 +22,22 @@ function getFiles(directory) {
   socket.emit('getfiles', directory);
 }
 
+// Bind a click handler via closure — file/dir names must NEVER be
+// concatenated into inline onclick attribute strings (that was an XSS on
+// names containing quotes; names are attacker-influenced via downloads).
+function onClickAction(el, fn, arg) {
+  return el.on('click', function () { fn(arg); });
+}
+
 // Render file list
 async function renderFiles(data) {
   let dirs = data[0];
   let files = data[1];
   let directory = data[2];
-  let baseName = directory.split('/').slice(-1)[0]; 
+  let baseName = directory.split('/').slice(-1)[0];
   let parentFolder = directory.replace(baseName,'');
-  let parentLink = $('<td>').addClass('directory').attr('onclick', 'getFiles(\'' + parentFolder + '\');').text('..');
-  let directoryClean = directory.replace("'","|");
-  if (directoryClean == '/') {
-    directoryClean = '';
-  }
+  let parentLink = onClickAction($('<td>').addClass('directory').text('..'), getFiles, parentFolder);
+  let directoryBase = (directory == '/') ? '' : directory;
   let table = $('<table>').addClass('fileTable');
   let tableHeader = $('<tr>');
   for await (name of ['fb.colName', 'fb.colType', 'fb.colDelete'].map(k => I18N.t(k))) {
@@ -53,10 +55,10 @@ async function renderFiles(data) {
   if (dirs.length > 0) {
     for await (let dir of dirs) {
       let tableRow = $('<tr>');
-      let dirClean = dir.replace("'","|");
-      let link = $('<td>').addClass('directory').attr('onclick', 'getFiles(\'' + directoryClean + '/' + dirClean + '\');').text(dir);
+      let dirPath = directoryBase + '/' + dir;
+      let link = onClickAction($('<td>').addClass('directory').text(dir), getFiles, dirPath);
       let type = $('<td>').text(I18N.t('fb.typeDir'));
-      let del = $('<td>').append($('<button>').addClass('deleteButton').attr('onclick', 'deleter(\'' + directoryClean + '/' + dirClean + '\');').text(I18N.t('fb.delete')));
+      let del = $('<td>').append(onClickAction($('<button>').addClass('deleteButton').text(I18N.t('fb.delete')), deleter, dirPath));
       for await (item of [link, type, del]) {
         tableRow.append(item);
       }
@@ -66,10 +68,10 @@ async function renderFiles(data) {
   if (files.length > 0) {
     for await (let file of files) {
       let tableRow = $('<tr>');
-      let fileClean = file.replace("'","|");
-      let link = $('<td>').addClass('file').attr('onclick', 'downloadFile(\'' + directoryClean + '/' + fileClean + '\');').text(file);
+      let filePath = directoryBase + '/' + file;
+      let link = onClickAction($('<td>').addClass('file').text(file), downloadFile, filePath);
       let type = $('<td>').text(I18N.t('fb.typeFile'));
-      let del = $('<td>').append($('<button>').addClass('deleteButton').attr('onclick', 'deleter(\'' + directoryClean + '/' + fileClean + '\');').text(I18N.t('fb.delete')));
+      let del = $('<td>').append(onClickAction($('<button>').addClass('deleteButton').text(I18N.t('fb.delete')), deleter, filePath));
       for await (item of [link, type, del]) {
         tableRow.append(item);
       }
@@ -80,7 +82,6 @@ async function renderFiles(data) {
 
 // Download a file
 function downloadFile(file) {
-  file = file.replace("|","'");
   socket.emit('downloadfile', file);
 }
 

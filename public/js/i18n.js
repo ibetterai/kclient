@@ -1,7 +1,9 @@
-// Dependency-free i18n for kclient (ADR 0001). No fetch, no build step.
-// Locale resolution order, fail-soft at every step:
-//   ?lang= on own URL -> ?lang= on top-frame URL -> localStorage["kclient.lang"]
-//   -> navigator.language -> "en". Resolved value is persisted to localStorage.
+// Dependency-free i18n for kclient (ADR 0001, resolution amended by ADR 0003).
+// No fetch, no build step. Locale resolution order, fail-soft at every step:
+//   ?lang= on own URL -> ?lang= on PARENT-frame URL -> ?lang= on top-frame URL
+//   -> localStorage["kclient.lang"] -> navigator.language -> "en".
+// Only URL-derived locales are persisted to localStorage — the navigator fallback
+// must never clobber the durable hint (ADR 0003).
 (function () {
   'use strict';
 
@@ -65,14 +67,27 @@
 
   function resolveLocale() {
     var raw = null;
+    var fromUrl = false;
     try { raw = langFromLocation(window.location); } catch (e) { raw = null; }
     if (!raw) {
       // The file manager runs in a nested iframe that does not inherit the
-      // parent's query string; read the top frame's URL (guard cross-origin).
+      // parent's query string. The PARENT frame is the kclient index page — the
+      // one frame guaranteed to carry ?lang= when an embedder (TermHub) sets it,
+      // regardless of how many frames sit above it (guard cross-origin).
       try {
-        if (window.top && window.top.location) raw = langFromLocation(window.top.location);
+        if (window.parent && window.parent !== window) raw = langFromLocation(window.parent.location);
       } catch (e) { raw = null; }
     }
+    if (!raw) {
+      // Last URL tier: the top frame, when it is a distinct third frame (an
+      // embedder above the kclient index that carries ?lang= itself).
+      try {
+        if (window.top && window.top !== window && window.top !== window.parent) {
+          raw = langFromLocation(window.top.location);
+        }
+      } catch (e) { raw = null; }
+    }
+    if (raw) fromUrl = true;
     if (!raw) {
       try { raw = window.localStorage.getItem('kclient.lang'); } catch (e) { raw = null; }
     }
@@ -80,7 +95,11 @@
       try { raw = navigator.language; } catch (e) { raw = null; }
     }
     var locale = normalize(raw) || 'en';
-    try { window.localStorage.setItem('kclient.lang', locale); } catch (e) { /* private mode etc. */ }
+    if (fromUrl) {
+      // Persist ONLY URL-derived locales: a frame that fell back to
+      // navigator.language must never overwrite the durable hint (ADR 0003).
+      try { window.localStorage.setItem('kclient.lang', locale); } catch (e) { /* private mode etc. */ }
+    }
     return locale;
   }
 
