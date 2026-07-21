@@ -31,13 +31,19 @@
   border: 1px solid var(--th-border);
   border-radius: var(--th-radius-lg);
   box-shadow: var(--th-shadow);
-  overflow: hidden;
+  /* No overflow:hidden here — it would clip the .close chip, which sits at
+   * top:-10px/right:-10px outside the panel. Corner clipping of the iframe is
+   * done by the border-radius on #files_frame itself. */
 }
 
 #files_frame {
+  display: block;
   width: 100%;
   height: 100%;
   border: 0;
+  /* Inner radius (panel radius minus its 1px border) clips the iframe paint
+   * so the rounded panel corners stay clean without clipping .close. */
+  border-radius: calc(var(--th-radius-lg) - 1px);
 }
 
 .close {

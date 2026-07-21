@@ -30,7 +30,8 @@ linuxserver `baseimage-kasmvnc` images at `/kclient`; TermHub overlays this fork
 - ADR 0002 — audio-default native in the fork; TermHub's start-hook sed contract preserved.
 - ADR 0003 — deterministic file-manager locale: own → parent → top URL tiers; persist
   localStorage only from URL-derived signals; `index.js` lang pass-through hardening.
-- ADR 0004 — TermHub theme bridge (`ib-theme` → `data-theme`), tokenized restyle,
+- ADR 0004 — TermHub theme bridge (`ib-theme` cookie + legacy `localStorage['theme']`
+  → `data-theme`), tokenized restyle,
   accent active state for the audio/mic sidebar icons.
 
 ## Invariants

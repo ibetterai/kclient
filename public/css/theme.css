@@ -4,7 +4,8 @@
  * --ib-* prefix) but are vendored here: kclient must render standalone with zero
  * external requests (fork rule: plain static files, works offline of any CDN).
  * Dark is the default; public/js/theme.js sets data-theme="light" on <html> when
- * TermHub's 'ib-theme' preference (or the OS) says so.
+ * TermHub's theme preference (the 'ib-theme' cookie / legacy localStorage['theme'])
+ * or the OS says so.
  *
  * No web-font imports on purpose — Google Fonts is unreachable from some client
  * networks (China route); the stack degrades to system sans/mono.
