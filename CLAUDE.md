@@ -40,6 +40,11 @@ ibetterai/terminal-streaming's browser-vnc Docker image via pinned `git clone` o
 - `#files` must never get `overflow: hidden` — the `.close` chip hangs outside its
   corner and would be clipped to a sliver; corner-clip the iframe via `border-radius`
   on `#files_frame` instead (ADR 0004).
+- Never build inline `onclick`/HTML attribute strings from file or directory names —
+  names are attacker-influenced (a page in the container can pick a download filename)
+  and attribute-string concatenation is an XSS on the serving origin. Bind handlers as
+  closures (`onClickAction` in `public/js/filebrowser.js`) passing the raw name; the old
+  single-occurrence `'`↔`|` mangling is gone and must not return.
 - Changes must not regress audio default, clipboard, or file-manager behavior.
 - Commits touching `public/` are consumed verbatim by the terminal-streaming image build —
   keep `public/js/kclient.js` path stable. The image overlays ONLY `public/`: `index.js`
