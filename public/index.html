@@ -16,9 +16,9 @@
     <iframe class="vnc" src="vnc/index.html?autoconnect=1&resize=remote&clipboard_up=true&clipboard_down=true&clipboard_seamless=true&show_control_bar=true<% if(path){ %><%- path -%><% } %>"></iframe>
     <!--LSIO Function Bar-->
     <div id="lsbar">
-      <img class="icons" id="fileButton" title="File Manager" src="public/css/files.svg" onclick="toggle('#files')"/>
-      <img class="icons" id="audioButton" title="Enable Audio" src="public/css/speaker.svg" onclick="audio()"/>
-      <img class="icons" id="micButton" title="Enable Microphone" src="public/css/mic.svg" onclick="mic()"/>
+      <img class="icons" id="fileButton" title="File Manager" data-i18n-title="sidebar.fileManager" src="public/css/files.svg" onclick="toggle('#files')"/>
+      <img class="icons" id="audioButton" title="Enable Audio" data-i18n-title="sidebar.enableAudio" src="public/css/speaker.svg" onclick="audio()"/>
+      <img class="icons" id="micButton" title="Enable Microphone" data-i18n-title="sidebar.enableMic" src="public/css/mic.svg" onclick="mic()"/>
     </div>
     <!--File Browser-->
     <div id="files">
@@ -27,6 +27,7 @@
     </div>
     <!--Main logic-->
     <script src="public/js/jquery.min.js"></script>
+    <script src="public/js/i18n.js"></script>
     <script src="public/js/kclient.js"></script>
   </body>
 </html>

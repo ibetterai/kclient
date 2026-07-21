@@ -38,11 +38,11 @@ async function renderFiles(data) {
   }
   let table = $('<table>').addClass('fileTable');
   let tableHeader = $('<tr>');
-  for await (name of ['Name', 'Type', 'Delete (NO WARNING)']) {
+  for await (name of ['fb.colName', 'fb.colType', 'fb.colDelete'].map(k => I18N.t(k))) {
     tableHeader.append($('<th>').text(name));
   }
   let parentRow = $('<tr>');
-  for await (item of [parentLink, $('<td>').text('Parent'), $('<td>')]) {
+  for await (item of [parentLink, $('<td>').text(I18N.t('fb.parent')), $('<td>')]) {
     parentRow.append(item);
   }
   table.append(tableHeader,parentRow);
@@ -55,8 +55,8 @@ async function renderFiles(data) {
       let tableRow = $('<tr>');
       let dirClean = dir.replace("'","|");
       let link = $('<td>').addClass('directory').attr('onclick', 'getFiles(\'' + directoryClean + '/' + dirClean + '\');').text(dir);
-      let type = $('<td>').text('Dir');
-      let del = $('<td>').append($('<button>').addClass('deleteButton').attr('onclick', 'deleter(\'' + directoryClean + '/' + dirClean + '\');').text('Delete'));
+      let type = $('<td>').text(I18N.t('fb.typeDir'));
+      let del = $('<td>').append($('<button>').addClass('deleteButton').attr('onclick', 'deleter(\'' + directoryClean + '/' + dirClean + '\');').text(I18N.t('fb.delete')));
       for await (item of [link, type, del]) {
         tableRow.append(item);
       }
@@ -68,8 +68,8 @@ async function renderFiles(data) {
       let tableRow = $('<tr>');
       let fileClean = file.replace("'","|");
       let link = $('<td>').addClass('file').attr('onclick', 'downloadFile(\'' + directoryClean + '/' + fileClean + '\');').text(file);
-      let type = $('<td>').text('File');
-      let del = $('<td>').append($('<button>').addClass('deleteButton').attr('onclick', 'deleter(\'' + directoryClean + '/' + fileClean + '\');').text('Delete'));
+      let type = $('<td>').text(I18N.t('fb.typeFile'));
+      let del = $('<td>').append($('<button>').addClass('deleteButton').attr('onclick', 'deleter(\'' + directoryClean + '/' + fileClean + '\');').text(I18N.t('fb.delete')));
       for await (item of [link, type, del]) {
         tableRow.append(item);
       }
@@ -116,14 +116,14 @@ async function upload(input) {
         let fileName = file.name;
         if (e.total < 200000000) {
           let data = e.target.result;
-          $('#filebrowser').append($('<div>').text('Uploading ' + fileName));
+          $('#filebrowser').append($('<div>').text(I18N.t('fb.uploading', { name: fileName })));
           if (file == input.files[input.files.length - 1]) {
             socket.emit('uploadfile', [directory, directoryUp + '/' + fileName, data, true]);
           } else {
             socket.emit('uploadfile', [directory, directoryUp + '/' + fileName, data, false]);
           }
         } else {
-          $('#filebrowser').append($('<div>').text('File too big ' + fileName));
+          $('#filebrowser').append($('<div>').text(I18N.t('fb.fileTooBig', { name: fileName })));
           await new Promise(resolve => setTimeout(resolve, 2000));
           socket.emit('getfiles', directory);
         }
@@ -152,7 +152,7 @@ function createFolder() {
   let folderName = $('#folderName').val();
   $('#folderName').val('');
   if ((folderName.length == 0) || (folderName.includes('/'))) {
-    alert('Bad or Null Directory Name');
+    alert(I18N.t('fb.badDirName'));
     return '';
   }
   $('#filebrowser').empty();
@@ -181,14 +181,14 @@ async function dropFiles(ev) {
         let fileName = file.name;
         if (e.total < 200000000) {
           let data = e.target.result;
-          $('#filebrowser').append($('<div>').text('Uploading ' + fileName));
+          $('#filebrowser').append($('<div>').text(I18N.t('fb.uploading', { name: fileName })));
           if (item == items[items.length - 1]) {
             socket.emit('uploadfile', [directory, directoryUp + '/' + fullPath, data, true]);
           } else {
             socket.emit('uploadfile', [directory, directoryUp + '/' + fullPath, data, false]);
           }
         } else {
-          $('#filebrowser').append($('<div>').text('File too big ' + fileName));
+          $('#filebrowser').append($('<div>').text(I18N.t('fb.fileTooBig', { name: fileName })));
           await new Promise(resolve => setTimeout(resolve, 2000));
           socket.emit('getfiles', directory);
         }

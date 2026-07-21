@@ -4,13 +4,14 @@
     <link rel="stylesheet" href="public/css/filebrowser.css">
     <script type="text/javascript" src="public/js/jquery.min.js"></script>
     <script src="files/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="public/js/i18n.js"></script>
     <script type="text/javascript" src="public/js/filebrowser.js"></script>
   </head>
   <body>
   <span id="buttons">
-    <input id="folderName" type="text" placeholder="Enter Directory Name"></input>
-    <button onclick="createFolder()">Create Folder</button>
-    <button onclick="$('#uploadInput').trigger( 'click' )">Upload Files</button>
+    <input id="folderName" type="text" placeholder="Enter Directory Name" data-i18n-placeholder="fb.folderNamePlaceholder"></input>
+    <button onclick="createFolder()" data-i18n="fb.createFolder">Create Folder</button>
+    <button onclick="$('#uploadInput').trigger( 'click' )" data-i18n="fb.uploadFiles">Upload Files</button>
     <input class="hidden" id="uploadInput" type='file' onchange="upload(this);" multiple>
   </span>
   <div id="filebrowser"></div>
