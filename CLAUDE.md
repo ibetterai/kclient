@@ -24,6 +24,13 @@ ibetterai/terminal-streaming's browser-vnc Docker image via pinned `git clone` o
 | Architecture overview | ARCHITECTURE.md | Active |
 | Skill state | .claude/ | Active |
 
+## Cross-repo standards
+Any PR that creates or changes a cross-repo standard, dependency, workflow, or
+operational procedure MUST include the corresponding update to
+ibetterai/ibetter-standards in the same PR or a linked PR (see
+standards/cross-repo-changes.md there). Org doctrine and the standards index
+live in that repo.
+
 ## Conventions
 
 - All user-facing sidebar strings go through the i18n lookup; never hardcode English in
